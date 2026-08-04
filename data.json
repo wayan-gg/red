@@ -2,7 +2,7 @@
     { "responsable": "todavía", "categoria": "Cableado", "alias": "UTP", "nombre": "Cable UTP Cat 5e", "cantidad": 1, "unidad": "rollo (aprox. 20-25 m)" },
     { "responsable": "todavía", "categoria": "Cableado", "alias": "Jack", "nombre": "Jack Keystone Cat 5e", "cantidad": 12, "unidad": "unidades" },
     { "responsable": "todavía", "categoria": "Cableado", "alias": "RJ45", "nombre": "Conectores RJ45 Cat 5e", "cantidad": 24, "unidad": "unidades" },
-    { "responsable": "todavía", "categoria": "Cableado", "alias": "Patch", "nombre": "Patch cords (30-50 cm)", "cantidad": 12, "unidad": "unidades" },
+    { "Darrell?": "todavía", "categoria": "Cableado", "alias": "Patch", "nombre": "Patch cords (30-50 cm)", "cantidad": 12, "unidad": "unidades" },
     { "responsable": "todavía", "categoria": "Cajas y placas", "alias": "Caja 2P", "nombre": "Cajas de superficie 2 puertos", "cantidad": 6, "unidad": "unidades" },
     { "responsable": "todavía", "categoria": "Cajas y placas", "alias": "Placa 2P", "nombre": "Faceplates (placas) 2 puertos", "cantidad": 6, "unidad": "unidades" },
     { "responsable": "todavía", "categoria": "Centro de cableado", "alias": "PatchPanel", "nombre": "Patch Panel Cat 5e 16 puertos", "cantidad": 1, "unidad": "unidades" },
