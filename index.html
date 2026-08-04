@@ -42,7 +42,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.95rem;
-            table-layout: auto; /* las columnas se ajustan al contenido */
+            table-layout: auto;
         }
         th {
             background: #0f172a;
@@ -64,6 +64,11 @@
             white-space: nowrap;
         }
         .alias {
+            font-weight: 500;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+        .responsable {
             font-weight: 500;
             color: #0f172a;
             white-space: nowrap;
@@ -93,9 +98,6 @@
         .error {
             color: #ef4444;
             font-weight: 500;
-        }
-        .exito {
-            color: #22c55e;
         }
         .file-input-wrapper {
             position: relative;
@@ -144,6 +146,7 @@
         <table id="tablaMateriales">
             <thead>
                 <tr>
+                    <th>Responsable</th>          <!-- NUEVA COLUMNA (esquina izquierda) -->
                     <th>Categoría</th>
                     <th>Alias / Nombre corto</th>
                     <th>Descripción</th>
@@ -152,7 +155,7 @@
                 </tr>
             </thead>
             <tbody id="cuerpoTabla">
-                <tr><td colspan="5" class="mensaje-carga">⏳ Cargando datos...</td></tr>
+                <tr><td colspan="6" class="mensaje-carga">⏳ Cargando datos...</td></tr>
             </tbody>
         </table>
     </div>
@@ -185,7 +188,7 @@
     // Renderiza la tabla a partir de un array de objetos
     function renderizarTabla(datos) {
         if (!Array.isArray(datos) || datos.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga">📭 No hay datos o el JSON está vacío</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="mensaje-carga">📭 No hay datos o el JSON está vacío</td></tr>`;
             contador.textContent = '0 elementos';
             return;
         }
@@ -193,6 +196,10 @@
         tbody.innerHTML = '';
         datos.forEach(item => {
             const tr = document.createElement('tr');
+            // Responsable (nuevo, primera columna)
+            const tdResp = document.createElement('td');
+            tdResp.className = 'responsable';
+            tdResp.textContent = item.responsable || 'todavía'; // si no existe, mostrar "todavía"
             // Categoría
             const tdCat = document.createElement('td');
             tdCat.className = 'categoria';
@@ -211,6 +218,7 @@
             const tdUni = document.createElement('td');
             tdUni.textContent = item.unidad || '';
 
+            tr.appendChild(tdResp);
             tr.appendChild(tdCat);
             tr.appendChild(tdAlias);
             tr.appendChild(tdNom);
@@ -223,7 +231,7 @@
 
     // Carga el JSON desde una URL (por defecto 'data.json')
     function cargarJSON(url = 'data.json') {
-        tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga">⏳ Cargando desde ${url}...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="mensaje-carga">⏳ Cargando desde ${url}...</td></tr>`;
         contador.textContent = '...';
 
         fetch(url)
@@ -237,17 +245,16 @@
                 if (!Array.isArray(data)) {
                     throw new Error('El JSON no es un array');
                 }
-                // Validación básica de estructura (opcional)
+                // Validación básica (opcional)
                 data.forEach((item, i) => {
                     if (typeof item !== 'object' || item === null) {
                         throw new Error(`Elemento ${i} no es un objeto`);
                     }
-                    // Aceptamos que falten propiedades, pero mostramos vacío
                 });
                 renderizarTabla(data);
             })
             .catch(error => {
-                tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga error">❌ Error al cargar ${url}: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="mensaje-carga error">❌ Error al cargar ${url}: ${error.message}</td></tr>`;
                 contador.textContent = 'Error';
                 console.error('Error cargando JSON:', error);
             });
@@ -266,12 +273,12 @@
                 renderizarTabla(data);
                 contador.textContent = `${data.length} elementos (archivo)`;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga error">❌ Error al leer el archivo: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="mensaje-carga error">❌ Error al leer el archivo: ${err.message}</td></tr>`;
                 contador.textContent = 'Error';
             }
         };
         reader.onerror = function() {
-            tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga error">❌ Error al leer el archivo</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="mensaje-carga error">❌ Error al leer el archivo</td></tr>`;
         };
         reader.readAsText(file);
     }
