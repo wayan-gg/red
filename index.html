@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Materiales desde JSON externo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f4f7fa;
+            padding: 30px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            table-layout: auto; /* las columnas se ajustan al contenido */
+        }
+        th {
+            background: #0f172a;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+        .categoria {
+            font-weight: 600;
+            color: #0f172a;
+            background: #f1f5f9;
+            white-space: nowrap;
+        }
+        .alias {
+            font-weight: 500;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+        .badge {
+            background: #e2e8f0;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #1e293b;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .mensaje-carga {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: 500;
+        }
+        .exito {
+            color: #22c55e;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .btn {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            background: transparent;
+            border: 1px solid #94a3b8;
+            color: #1e293b;
+        }
+        .btn:hover {
+            background: #e2e8f0;
+        }
+        .btn-success {
+            background: #22c55e;
+            color: white;
+            border-color: #22c55e;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📋 Materiales de Cableado Estructurado</h1>
+    <p class="subtitle">Datos cargados desde <code>data.json</code> (misma carpeta)</p>
+
+    <div class="table-wrapper">
+        <table id="tablaMateriales">
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Alias / Nombre corto</th>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Unidad</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+                <tr><td colspan="5" class="mensaje-carga">⏳ Cargando datos...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex-between">
+        <span class="badge" id="contador">0 elementos</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div class="file-input-wrapper">
+                <button class="btn">📂 Cargar otro JSON</button>
+                <input type="file" id="fileInput" accept=".json" />
+            </div>
+            <button class="btn btn-success" id="btnRecargar">🔄 Recargar data.json</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // -------------------------------------------------------------
+    // 1. REFERENCIAS DOM
+    // -------------------------------------------------------------
+    const tbody = document.getElementById('cuerpoTabla');
+    const contador = document.getElementById('contador');
+    const fileInput = document.getElementById('fileInput');
+    const btnRecargar = document.getElementById('btnRecargar');
+
+    // -------------------------------------------------------------
+    // 2. FUNCIONES
+    // -------------------------------------------------------------
+
+    // Renderiza la tabla a partir de un array de objetos
+    function renderizarTabla(datos) {
+        if (!Array.isArray(datos) || datos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga">📭 No hay datos o el JSON está vacío</td></tr>`;
+            contador.textContent = '0 elementos';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        datos.forEach(item => {
+            const tr = document.createElement('tr');
+            // Categoría
+            const tdCat = document.createElement('td');
+            tdCat.className = 'categoria';
+            tdCat.textContent = item.categoria || '';
+            // Alias
+            const tdAlias = document.createElement('td');
+            tdAlias.className = 'alias';
+            tdAlias.textContent = item.alias || '';
+            // Descripción
+            const tdNom = document.createElement('td');
+            tdNom.textContent = item.nombre || '';
+            // Cantidad
+            const tdCant = document.createElement('td');
+            tdCant.textContent = item.cantidad ?? '';
+            // Unidad
+            const tdUni = document.createElement('td');
+            tdUni.textContent = item.unidad || '';
+
+            tr.appendChild(tdCat);
+            tr.appendChild(tdAlias);
+            tr.appendChild(tdNom);
+            tr.appendChild(tdCant);
+            tr.appendChild(tdUni);
+            tbody.appendChild(tr);
+        });
+        contador.textContent = `${datos.length} elementos`;
+    }
+
+    // Carga el JSON desde una URL (por defecto 'data.json')
+    function cargarJSON(url = 'data.json') {
+        tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga">⏳ Cargando desde ${url}...</td></tr>`;
+        contador.textContent = '...';
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data)) {
+                    throw new Error('El JSON no es un array');
+                }
+                // Validación básica de estructura (opcional)
+                data.forEach((item, i) => {
+                    if (typeof item !== 'object' || item === null) {
+                        throw new Error(`Elemento ${i} no es un objeto`);
+                    }
+                    // Aceptamos que falten propiedades, pero mostramos vacío
+                });
+                renderizarTabla(data);
+            })
+            .catch(error => {
+                tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga error">❌ Error al cargar ${url}: ${error.message}</td></tr>`;
+                contador.textContent = 'Error';
+                console.error('Error cargando JSON:', error);
+            });
+    }
+
+    // Carga un archivo seleccionado por el usuario
+    function cargarDesdeArchivo(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const contenido = e.target.result;
+                const data = JSON.parse(contenido);
+                if (!Array.isArray(data)) {
+                    throw new Error('El archivo no contiene un array');
+                }
+                renderizarTabla(data);
+                contador.textContent = `${data.length} elementos (archivo)`;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga error">❌ Error al leer el archivo: ${err.message}</td></tr>`;
+                contador.textContent = 'Error';
+            }
+        };
+        reader.onerror = function() {
+            tbody.innerHTML = `<tr><td colspan="5" class="mensaje-carga error">❌ Error al leer el archivo</td></tr>`;
+        };
+        reader.readAsText(file);
+    }
+
+    // -------------------------------------------------------------
+    // 3. EVENTOS E INICIALIZACIÓN
+    // -------------------------------------------------------------
+
+    // Cargar automáticamente 'data.json' al iniciar
+    cargarJSON('data.json');
+
+    // Botón recargar
+    btnRecargar.addEventListener('click', function() {
+        cargarJSON('data.json');
+    });
+
+    // Cargar otro archivo JSON
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files.length > 0) {
+            cargarDesdeArchivo(this.files[0]);
+            this.value = ''; // permitir cargar el mismo archivo nuevamente
+        }
+    });
+
+    console.log('✅ Página lista: esperando data.json');
+</script>
+</body>
+</html>
